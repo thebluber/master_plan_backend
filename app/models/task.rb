@@ -11,17 +11,38 @@ class Task < ActiveRecord::Base
   #3: onetime
   validates :flag, inclusion: { in: 0..3 }
 
-  def done?(date)
+  def onetime?
+    self.flag == 3
+  end
+
+  def daily?
+    self.flag == 0
+  end
+
+  def weekly?
+    self.flag == 1
+  end
+
+  def monthly?
+    self.flag == 2
+  end
+
+  #Is the task done at the given date
+  def done?(date=nil)
     return false if self.done_tasks.empty?
-    case self.flag
-    when 3
+    if self.onetime?
       return !self.done_tasks.empty?
-    when 0
-      return !self.done_tasks.where(year: date.year, month: date.month, cweek: date.cweek, cwday: date.cwday).empty?
-    when 1
-      return !self.done_tasks.where(year: date.year, month: date.month, cweek: date.cweek).empty?
-    when 2
-      return !self.done_tasks.where(year: date.year, month: date.month).empty?
+    elsif date
+      if self.daily?
+        return !self.done_tasks.where(year: date.year, month: date.month, cweek: date.cweek, cwday: date.cwday).empty?
+      elsif self.weekly?
+        return !self.done_tasks.where(year: date.year, month: date.month, cweek: date.cweek).empty?
+      elsif self.monthly?
+        return !self.done_tasks.where(year: date.year, month: date.month).empty?
+      end
+    else
+      #cyclic tasks are never done, if the date is not given
+      false
     end
   end
 end

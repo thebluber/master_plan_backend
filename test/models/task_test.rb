@@ -26,6 +26,16 @@ class TaskTest < ActiveSupport::TestCase
       Timecop.return
     end
 
+    should "find out whether the task is done or not without a specific date" do
+      assert_not @onetime.done?
+      create(:done_task, task: @onetime)
+      assert @onetime.done?
+
+      assert_not @daily.done?
+      assert_not @weekly.done?
+      assert_not @monthly.done?
+    end
+
     should "find out whether the onetime task is done at given date" do
       assert_not @onetime.done?(Date.today)
       create(:done_task, task: @onetime)

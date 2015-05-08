@@ -14,7 +14,7 @@ module API
         get do
           if params[:date]
           else
-            (represent_variant current_user.tasks.order(:flag)).to_json({somearg: 'test'})
+            (represent_variant current_user.tasks.order(:flag)).to_hash({somearg: 'test'})
           end
         end
 

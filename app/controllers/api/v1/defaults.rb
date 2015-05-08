@@ -43,6 +43,19 @@ module API
             collection.map {|item| represent(item, *args) }
           end
 
+          def represent_variant object_or_collection
+            if object_or_collection.respond_to?(:each)
+              return [] if object_or_collection.empty?
+              object = object_or_collection.first
+              representer = "#{object.class}Presenter".constantize
+              object_or_collection.extend(representer.for_collection)
+            else
+              object = object_or_collection
+              representer = "#{object.class}Presenter".constantize
+              object_or_collection.extend(representer)
+            end
+          end
+
         end
 
         #TODO find out why this validator class can not be found in testing environment if it is in the validator/ directory

@@ -13,8 +13,9 @@ module API
         end
         get do
           if params[:date]
+            represent_variant current_user.tasks.order(:flag).where(deadline: params[:date])
           else
-            represent_each current_user.tasks.order(:flag), with: TaskPresenter
+            (represent_variant current_user.tasks.order(:flag)).to_hash({somearg: 'test'})
           end
         end
 
@@ -27,13 +28,17 @@ module API
           optional :goal_id, type: Integer, existing: true
         end
         post do
+          nil
         end
 
         desc "GET /tasks/:id"
         params do
           requires :id, type: Integer
         end
-        get ':id' do
+        route_param :id do
+          get do
+            represent_variant current_user.tasks.find(params[:id])
+          end
         end
 
         desc "PUT /tasks/:id"

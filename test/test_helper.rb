@@ -1,6 +1,7 @@
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
+require 'mocha/mini_test'
 require 'simplecov'
 SimpleCov.start 'rails'
 
@@ -20,8 +21,13 @@ end
 #/test/api/v1/ directory
 module APITest
   @@API_ROOT = "/api/v1"
+
   def self.included(base)
     base.send :include, Rack::Test::Methods
+  end
+
+  def path url
+    "#{@@API_ROOT}/#{url}"
   end
 
   def app

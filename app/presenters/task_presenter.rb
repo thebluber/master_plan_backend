@@ -1,7 +1,7 @@
 require 'roar/decorator'
 require 'roar/json'
 
-class TaskPresenter < Roar::Decorator
+module TaskPresenter
   include Roar::JSON
 
   property :id
@@ -10,11 +10,12 @@ class TaskPresenter < Roar::Decorator
   property :category_id
   property :goal_id
   property :deadline
-  #property :done
-
-  def done
-    binding.pry
-    #args[:date] ? represented.done?(args[:date]) : represented.done?
-  end
+  property :done, getter: lambda { |args|
+    if args[:date] ? self.done?(args[:date]) : self.done?
+      1
+    else
+      0
+    end
+  }
 
 end

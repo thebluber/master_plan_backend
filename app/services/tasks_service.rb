@@ -1,6 +1,10 @@
 class TasksService
-  def self.fetch_for user, date
+  def self.fetch_for user, date=nil, order=:flag
     #date must be a date object
-    user.tasks.where("created_at < ?", date + 1).reject{ |task| task.onetime? && task.done?(date) }
+    if date
+      user.tasks.where("created_at < ?", date + 1).order(order).reject{ |task| task.onetime? && task.done?(date) }
+    else
+      user.tasks.order(order)
+    end
   end
 end

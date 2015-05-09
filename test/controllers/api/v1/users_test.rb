@@ -1,3 +1,5 @@
+require 'test_helper'
+
 class API::V1::UsersTest < ActionController::TestCase
   include API::V1::APITestHelper
   context "user login" do

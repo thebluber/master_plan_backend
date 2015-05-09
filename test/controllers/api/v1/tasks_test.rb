@@ -1,3 +1,5 @@
+require 'test_helper'
+
 class API::V1::TasksTest < ActionController::TestCase
   include API::V1::APITestHelper
 
@@ -21,6 +23,7 @@ class API::V1::TasksTest < ActionController::TestCase
       @user = create(:user)
 
       time = Time.local(2015, 5, 6, 18, 0, 0) #2015-05-06 is a Wednesday
+      Timecop.travel(time)
 
       #onetime
       onetime = create(:task, flag: 3, user: @user)
@@ -37,10 +40,12 @@ class API::V1::TasksTest < ActionController::TestCase
       monthly = create(:task, flag: 2, user: @user)
       create(:done_task, task: monthly, created_at: time)
 
+      Timecop.return
+
       log_in @user.email, "1234"
 
       #JSON response json
-      @all_tasks_represented = [daily, weekly, monthly, onetime].extend(TaskPresenter.for_collection).to_json
+      @all_tasks_represented = [daily, weekly, monthly, onetime].extend(TaskPresenter.for_collection)
 
       @category = create(:category, user: @user)
       @goal = create(:goal, user: @user)
@@ -49,15 +54,14 @@ class API::V1::TasksTest < ActionController::TestCase
     should "return all tasks of user" do
       get "/api/v1/tasks"
       assert last_response.ok?
-      assert_equal last_response.body, @all_tasks_represented
+      assert_equal last_response.body, @all_tasks_represented.to_json
     end
 
     should "return all tasks on the given date" do
-      skip('Not yet implemented')
       %w{2015-05-06 2015-05-07 2015-05-14 2015-06-07}.each do |date|
         get "/api/v1/tasks?date=" + date
         assert last_response.ok?
-        assert_equal JSON.parse(last_response.body), @tasks[date]
+        assert_equal last_response.body, @all_tasks_represented.to_json(date: date.to_date)
       end
     end
 

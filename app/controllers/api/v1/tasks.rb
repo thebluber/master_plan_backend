@@ -13,9 +13,9 @@ module API
         end
         get do
           if params[:date]
-            represent_variant current_user.tasks.order(:flag).where(deadline: params[:date])
+            (represent_variant TasksService.fetch_all_for(current_user, params[:date])).to_hash({date: params[:date]})
           else
-            (represent_variant current_user.tasks.order(:flag)).to_hash({somearg: 'test'})
+            represent_variant TasksService.fetch_all_for(current_user)
           end
         end
 
@@ -37,7 +37,7 @@ module API
         end
         route_param :id do
           get do
-            represent_variant current_user.tasks.find(params[:id])
+            represent_variant TasksService.fetch_one_for(current_user, params[:id])
           end
         end
 

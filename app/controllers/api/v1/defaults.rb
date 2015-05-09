@@ -24,25 +24,6 @@ module API
             error! 'Not authenticated', 401 unless authenticated?
           end
 
-          def represent(*args)
-            opts = args.last.is_a?(Hash) ? args.pop : {}
-            with = opts[:with] || (raise ArgumentError.new(":with option is required"))
-
-            raise ArgumentError.new("nil can't be represented") unless args.first
-
-            if with.is_a?(Class) #as Decorator
-              with.new(*args)
-            elsif args.length > 1
-              raise ArgumentError.new("Can't represent using module with more than one argument")
-            else #as Module
-              args.first.extend(with)
-            end
-          end
-
-          def represent_each(collection, *args)
-            collection.map {|item| represent(item, *args) }
-          end
-
           def represent_variant object_or_collection
             if object_or_collection.respond_to?(:each)
               return [] if object_or_collection.empty?

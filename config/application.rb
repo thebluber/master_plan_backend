@@ -20,7 +20,8 @@ module MasterPlan
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
     config.autoload_paths += %W(#{config.root}/app/validators)
+    config.autoload_paths += %W(#{config.root}/app/services)
     config.autoload_paths += %W(#{config.root}/app/presenters)
-    config.autoload_paths += Dir["#{config.root}/app/presenters/**/"]
+    #config.autoload_paths += Dir["#{config.root}/app/presenters/**/"]
   end
 end

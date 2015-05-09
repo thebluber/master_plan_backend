@@ -53,6 +53,7 @@ class API::V1::TasksTest < ActionController::TestCase
     end
 
     should "return all tasks on the given date" do
+      skip('Not yet implemented')
       %w{2015-05-06 2015-05-07 2015-05-14 2015-06-07}.each do |date|
         get "#{@@API_ROOT}/tasks?date=" + date
         assert last_response.ok?
@@ -61,6 +62,7 @@ class API::V1::TasksTest < ActionController::TestCase
     end
 
     should "create new task without goal, with deadline" do
+      skip('Not yet implemented')
       new_task = {
         description: "NewTask",
         flag: 3,
@@ -79,6 +81,7 @@ class API::V1::TasksTest < ActionController::TestCase
     end
 
     should "create new task with goal, without deadline" do
+      skip('not yet implemented')
       new_task = {
         description: "NewTask1",
         flag: 0,

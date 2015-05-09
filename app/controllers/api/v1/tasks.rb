@@ -28,13 +28,17 @@ module API
           optional :goal_id, type: Integer, existing: true
         end
         post do
+          nil
         end
 
         desc "GET /tasks/:id"
         params do
           requires :id, type: Integer
         end
-        get ':id' do
+        route_param :id do
+          get do
+            represent_variant current_user.tasks.find(params[:id])
+          end
         end
 
         desc "PUT /tasks/:id"

@@ -128,7 +128,16 @@ class API::V1::TasksTest < ActionController::TestCase
     setup do
       @user = create(:user)
       @task = create(:task, flag: 3, user: @user)
-      sign_in @user
+      @represented_task = @task.extend(TaskPresenter).to_json
+    end
+
+    should 'return the task with the given id' do
+      log_in @user.email, '1234'
+
+      get path("tasks/#{@task.id}")
+
+      assert last_response.ok?
+      assert_equal last_response.body, @represented_task
     end
   end
 end

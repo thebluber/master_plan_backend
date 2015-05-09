@@ -14,31 +14,6 @@ class ActiveSupport::TestCase
 end
 
 class ActionController::TestCase
+  require_relative 'controllers/api/v1/api_test_helper'
   include Devise::TestHelpers
-end
-
-#TODO find out why this following module can not be found if it is in the api_test.rb file in
-#/test/api/v1/ directory
-module APITest
-  @@API_ROOT = "/api/v1"
-
-  def self.included(base)
-    base.send :include, Rack::Test::Methods
-  end
-
-  def path url
-    "#{@@API_ROOT}/#{url}"
-  end
-
-  def app
-    Rails.application
-  end
-
-  def log_in email, pw
-    post "#{@@API_ROOT}/users/sign_in", { user: { email: email, password: pw } }
-  end
-
-  def log_out
-    delete "#{@@API_ROOT}/users/sign_out"
-  end
 end

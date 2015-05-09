@@ -13,6 +13,7 @@ module API
         end
         get do
           if params[:date]
+            represent_variant current_user.tasks.order(:flag).where(deadline: params[:date])
           else
             (represent_variant current_user.tasks.order(:flag)).to_hash({somearg: 'test'})
           end

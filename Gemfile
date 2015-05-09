@@ -33,6 +33,7 @@ group :development, :test do
   gem 'shoulda'
   gem 'timecop'
   gem 'simplecov'
+  gem 'mocha'
 end
 
 gem 'devise'

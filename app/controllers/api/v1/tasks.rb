@@ -7,17 +7,24 @@ module API
           ensure_authentication!
         end
 
-        desc "return user's tasks or user's tasks on given date"
-        params do
-          optional :date, type: Date
-        end
+        desc "GET /tasks"
         get do
-          if params[:date]
-            (represent_variant TasksService.fetch_for(current_user, params[:date])).to_hash({date: params[:date]})
-          else
-            represent_variant TasksService.fetch_for(current_user)
+          represent_variant TasksService.fetch_for(current_user)
+        end
+
+        namespace :for_date do
+          desc "GET /tasks/for_date/:date"
+          params do
+            requires :date, type: Date
+          end
+          route_param :date do
+            desc "return user'tasks on the given date"
+            get do
+              (represent_variant TasksService.fetch_for(current_user, params[:date])).to_hash({ date: params[:date] })
+            end
           end
         end
+
 
         desc "create a new task"
         params do

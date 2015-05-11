@@ -5,7 +5,7 @@ class API::V1::TasksTest < ActionController::TestCase
 
   context "authtenticated access" do
     should "abort all unauthenticated accesses" do
-      %w{tasks tasks/1 tasks?date=2015-05-06}.each do |w|
+      %w{tasks tasks/1 tasks/for_date/2015-05-06}.each do |w|
         get "/api/v1/#{w}"
         assert_equal last_response.status, 401
       end
@@ -59,7 +59,7 @@ class API::V1::TasksTest < ActionController::TestCase
 
     should "return all tasks on the given date" do
       %w{2015-05-06 2015-05-07 2015-05-14 2015-06-07}.each do |date|
-        get "/api/v1/tasks?date=" + date
+        get "/api/v1/tasks/for_date/" + date
         assert last_response.ok?
         assert_equal last_response.body, @all_tasks_represented.to_json(date: date.to_date)
       end

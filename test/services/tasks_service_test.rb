@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class TasksServiceTest < ActiveSupport::TestCase
-  context "fetch_all_for" do
+  context "fetch_for" do
     setup do
       @user = create(:user)
 
@@ -21,29 +21,17 @@ class TasksServiceTest < ActiveSupport::TestCase
     end
 
     should "return all tasks of user" do
-      assert_equal TasksService.fetch_all_for(@user), @user.tasks.order(:flag)
+      assert_equal TasksService.fetch_for(@user), @user.tasks.order(:flag)
     end
 
     should "return tasks on the given date without done onetime tasks ordered by flag" do
-      assert_equal TasksService.fetch_all_for(@user, "2015-05-06".to_date), @tasks_for_date
+      assert_equal TasksService.fetch_for(@user, "2015-05-06".to_date), @tasks_for_date
     end
 
     should "not return tasks created after the given date" do
       create(:task, flag: 1, user: @user)
       create(:task, flag: 3, user: @user)
-      assert_equal TasksService.fetch_all_for(@user, "2015-05-06".to_date), @tasks_for_date
-    end
-  end
-
-  context "fetch_one_for" do
-    setup do
-      @user = create(:user)
-      @task = create(:task, user: @user)
-    end
-
-    should "fetch the given task for user and return nil if the task does not exist" do
-      assert_equal TasksService.fetch_one_for(@user, @task.id), @task
-      assert_nil TasksService.fetch_one_for(@user, 100000)
+      assert_equal TasksService.fetch_for(@user, "2015-05-06".to_date), @tasks_for_date
     end
   end
 end

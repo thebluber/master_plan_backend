@@ -66,7 +66,6 @@ class API::V1::TasksTest < ActionController::TestCase
     end
 
     should "create new task without goal, with deadline" do
-      skip('Not yet implemented')
       new_task = {
         description: "NewTask",
         flag: 3,
@@ -74,18 +73,17 @@ class API::V1::TasksTest < ActionController::TestCase
         deadline: "2015-10-10"
       }
       post "/api/v1/tasks", new_task
-      assert last_response.ok?
+      assert_equal last_response.status, 201
       new_task.each do |k, v|
-        assert_equal Task.last[k], new_task[k]
+        assert_equal Task.last[k].to_s, new_task[k].to_s
       end
       assert_nil Task.last.goal
       new_task[:id] = Task.last.id
-      new_task[:goal_id] = nil
+      new_task[:done] = 0
       assert_equal JSON.parse(last_response.body), new_task.stringify_keys
     end
 
     should "create new task with goal, without deadline" do
-      skip('not yet implemented')
       new_task = {
         description: "NewTask1",
         flag: 0,
@@ -93,13 +91,13 @@ class API::V1::TasksTest < ActionController::TestCase
         goal_id: @goal.id
       }
       post "/api/v1/tasks", new_task
-      assert last_response.ok?
+      assert_equal last_response.status, 201
       new_task.each do |k, v|
-        assert_equal Task.last[k], new_task[k]
+        assert_equal Task.last[k].to_s, new_task[k].to_s
       end
       assert_nil Task.last.deadline
       new_task[:id] = Task.last.id
-      new_task[:deadline] = nil
+      new_task[:done] = 0
       assert_equal JSON.parse(last_response.body), new_task.stringify_keys
     end
 
@@ -107,25 +105,37 @@ class API::V1::TasksTest < ActionController::TestCase
       count = Task.count
       #without description
       post "/api/v1/tasks", { flag: 0, category_id: @category.id }
-      assert_not last_response.ok?
+      assert_equal last_response.status, 400
+      assert JSON.parse(last_response.body)["error"].include?("description is missing")
+
       #without flag
       post "/api/v1/tasks", { description: "Task", category_id: @category.id }
-      assert_not last_response.ok?
+      assert_equal last_response.status, 400
+      assert JSON.parse(last_response.body)["error"].include?("flag is missing")
+
       #without category
       post "/api/v1/tasks", { description: "Task", flag: 0 }
-      assert_not last_response.ok?
+      assert_equal last_response.status, 400
+      assert JSON.parse(last_response.body)["error"].include?("category_id is missing")
+
       #invalid flag
       post "/api/v1/tasks", { description: "Task", flag: 4, category_id: @category.id }
-      assert_not last_response.ok?
+      assert_equal last_response.status, 400
+      assert JSON.parse(last_response.body)["error"].include?("flag does not have a valid value")
+
       #invalid category
       post "/api/v1/tasks", { description: "Task", flag: 0, category_id: 100 }
-      assert_not last_response.ok?
+      assert_equal last_response.status, 400
+      assert_equal JSON.parse(last_response.body)["error"], "Couldn't find Category with 'id'=100"
+
       #invalid goal
       post "/api/v1/tasks", { description: "Task", flag: 0, category_id: @category.id, goal_id: 100 }
-      assert_not last_response.ok?
+      assert_equal last_response.status, 400
+      assert_equal JSON.parse(last_response.body)["error"], "Couldn't find Goal with 'id'=100"
+
       #wrong date format
-      post "/api/v1/tasks", { description: "Task", flag: 0, category_id: @category, deadline: "2015/05/07" }
-      assert_not last_response.ok?
+      post "/api/v1/tasks", { description: "Task", flag: 0, category_id: @category.id, deadline: "2015-20-39" }
+      assert JSON.parse(last_response.body)["error"].include?("deadline is invalid")
 
       assert_equal Task.count, count
     end
@@ -134,17 +144,73 @@ class API::V1::TasksTest < ActionController::TestCase
   context "/tasks/:id" do
     setup do
       @user = create(:user)
+      log_in @user.email, "1234"
+
       @task = create(:task, flag: 3, user: @user)
       @represented_task = @task.extend(TaskPresenter).to_json
+
+      @goal = create(:goal, user: @user)
+      @category = create(:category, user: @user)
     end
 
-    should 'return the task with the given id' do
-      log_in @user.email, '1234'
+    should "return the task with the given id" do
 
       get "/api/v1/tasks/#{@task.id}"
 
       assert last_response.ok?
       assert_equal last_response.body, @represented_task
+    end
+
+    should "handle id not found error" do
+
+      get "/api/v1/tasks/10000"
+
+      assert_equal last_response.status, 400
+      assert_equal JSON.parse(last_response.body)["error"], "Couldn't find Task with 'id'=10000"
+    end
+
+    should "update the task with the given id" do
+
+      update = {
+        description: "New description",
+        flag: 2,
+        deadline: "2015-12-30",
+        goal_id: @goal.id,
+        category_id: @category.id
+      }
+
+      put "/api/v1/tasks/#{@task.id}", update
+
+      assert last_response.ok?
+      update[:id] = @task.id
+      update[:done] = 0
+      assert_equal JSON.parse(last_response.body), update.stringify_keys
+    end
+
+    should "not update the task, if the input is invalid" do
+
+      #task not found
+      put "/api/v1/tasks/10000", {}
+      assert_equal last_response.status, 400
+      assert_equal JSON.parse(last_response.body)["error"], "Couldn't find Task with 'id'=10000"
+
+      #invalid deadline
+      put "/api/v1/tasks/#{@task.id}", {deadline: "2015-29-12"}
+      assert_equal last_response.status, 400
+
+      #invalid flag
+      put "/api/v1/tasks/#{@task.id}", {flag: 4}
+      assert_equal last_response.status, 400
+
+      #invalid goal
+      put "/api/v1/tasks/#{@task.id}", {goal_id: 10000}
+      assert_equal last_response.status, 400
+      assert_equal JSON.parse(last_response.body)["error"], "Couldn't find Goal with 'id'=10000"
+
+      #invalid category
+      put "/api/v1/tasks/#{@task.id}", {category_id: 10000}
+      assert_equal last_response.status, 400
+      assert_equal JSON.parse(last_response.body)["error"], "Couldn't find Category with 'id'=10000"
     end
   end
 end

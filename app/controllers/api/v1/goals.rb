@@ -68,13 +68,7 @@ module API
           end
           post 'tasks' do
             category = current_user.categories.find(params[:category_id])
-            new_task = current_user.tasks.new({
-              description: params[:description],
-              category: category,
-              flag: params[:flag],
-              goal_id: @goal.id
-            })
-            new_task.deadline = params[:deadline] if params[:deadline]
+            new_task = TasksService.create_task_for @goal, params
 
             if new_task.save
               represent_variant new_task

@@ -38,14 +38,7 @@ module API
           goal = current_user.goals.find(params[:goal_id]) if params[:goal_id]
           category = current_user.categories.find(params[:category_id])
 
-          new_task = current_user.tasks.new({
-            description: params[:description],
-            category: category,
-            flag: params[:flag]
-          })
-
-          new_task.deadline = params[:deadline] if params[:deadline]
-          new_task.goal = goal if goal
+          new_task = TasksService.create_task_for current_user, params
 
           if new_task.save
             represent_variant new_task

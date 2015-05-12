@@ -53,12 +53,23 @@ class TasksServiceTest < ActiveSupport::TestCase
       assert @user.tasks.include? task
     end
 
-    should "create task from given params for goal" do
+    should "create task from params for goal with deadline given" do
+      task = TasksService.create_task_for @goal, @params
+      %w{description flag category_id deadline}.each do |attr|
+        assert_equal task.send(attr), @params.send(attr)
+      end
+      task.save
+
+      assert @user.tasks.include? task
+      assert_equal task.goal, @goal
+    end
+
+    should "create task from given params for goal without deadline" do
       @goal.deadline = "2016-05-08"
       @goal.save
       @params.deadline = nil
       task = TasksService.create_task_for @goal, @params
-      %w{description flag category_id goal_id}.each do |attr|
+      %w{description flag category_id}.each do |attr|
         assert_equal task.send(attr), @params.send(attr)
       end
 

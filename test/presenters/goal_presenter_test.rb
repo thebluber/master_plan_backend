@@ -11,7 +11,7 @@ class GoalPresenterTest < ActiveSupport::TestCase
     }
 
     goal = create :goal
-    tasks = 4.times.to_a.map{ create(:task, goal: goal).extend(TaskPresenter).to_hash }
+    tasks = 4.times.map{ create(:task, goal: goal) }.extend(TaskPresenter.for_collection)
 
     represented_goal = goal.extend(GoalPresenter).to_hash
 

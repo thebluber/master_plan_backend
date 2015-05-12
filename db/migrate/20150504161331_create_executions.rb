@@ -1,6 +1,6 @@
-class CreateDoneTasks < ActiveRecord::Migration
+class CreateExecutions < ActiveRecord::Migration
   def change
-    create_table :done_tasks do |t|
+    create_table :executions do |t|
       t.integer :task_id
       t.integer :cwday
       t.integer :cweek

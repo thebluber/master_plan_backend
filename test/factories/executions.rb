@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :done_task do
+  factory :execution do
     task
   end
 end

@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 20150505130821) do
     t.datetime "updated_at"
   end
 
-  create_table "done_tasks", force: true do |t|
+  create_table "executions", force: true do |t|
     t.integer  "task_id"
     t.integer  "cwday"
     t.integer  "cweek"

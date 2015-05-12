@@ -2,7 +2,7 @@ class Task < ActiveRecord::Base
   belongs_to :user
   belongs_to :goal
   belongs_to :category
-  has_many :done_tasks
+  has_many :executions
   validates :user, :category, :flag, :description, presence: true
   #flag should be one of following:
   #0: daily
@@ -29,16 +29,16 @@ class Task < ActiveRecord::Base
 
   #Is the task done at the given date
   def done?(date=nil)
-    return false if self.done_tasks.empty?
+    return false if self.executions.empty?
     if self.onetime?
-      return !self.done_tasks.empty?
+      return !self.executions.empty?
     elsif date
       if self.daily?
-        return !self.done_tasks.where(year: date.year, month: date.month, cweek: date.cweek, cwday: date.cwday).empty?
+        return !self.executions.where(year: date.year, month: date.month, cweek: date.cweek, cwday: date.cwday).empty?
       elsif self.weekly?
-        return !self.done_tasks.where(year: date.year, month: date.month, cweek: date.cweek).empty?
+        return !self.executions.where(year: date.year, month: date.month, cweek: date.cweek).empty?
       elsif self.monthly?
-        return !self.done_tasks.where(year: date.year, month: date.month).empty?
+        return !self.executions.where(year: date.year, month: date.month).empty?
       end
     else
       #cyclic tasks are never done, if the date is not given

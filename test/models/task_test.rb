@@ -6,7 +6,7 @@ class TaskTest < ActiveSupport::TestCase
   should belong_to(:user)
   should belong_to(:category)
   should belong_to(:goal)
-  should have_many(:done_tasks)
+  should have_many(:executions)
   should validate_inclusion_of(:flag).in_range(0..3)
   should_not allow_value(4).for(:flag)
 
@@ -18,17 +18,17 @@ class TaskTest < ActiveSupport::TestCase
       #2015-05-04 is a monday
       Timecop.travel(time)
       @daily = create(:task, flag: 0)
-      create(:done_task, task: @daily)
+      create(:execution, task: @daily)
       @weekly = create(:task, flag: 1)
-      create(:done_task, task: @weekly)
+      create(:execution, task: @weekly)
       @monthly = create(:task, flag: 2)
-      create(:done_task, task: @monthly)
+      create(:execution, task: @monthly)
       Timecop.return
     end
 
     should "find out whether the task is done or not without a specific date" do
       assert_not @onetime.done?
-      create(:done_task, task: @onetime)
+      create(:execution, task: @onetime)
       assert @onetime.done?
 
       assert_not @daily.done?
@@ -38,7 +38,7 @@ class TaskTest < ActiveSupport::TestCase
 
     should "find out whether the onetime task is done at given date" do
       assert_not @onetime.done?(Date.today)
-      create(:done_task, task: @onetime)
+      create(:execution, task: @onetime)
       assert @onetime.done?(Date.today)
     end
 

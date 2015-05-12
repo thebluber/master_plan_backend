@@ -30,15 +30,15 @@ class API::V1::TasksTest < ActionController::TestCase
 
       #daily
       daily = create(:task, flag: 0, user: @user)
-      create(:done_task, task: daily, created_at: time)
+      create(:execution, task: daily, created_at: time)
 
       #weekly
       weekly = create(:task, flag: 1, user: @user)
-      create(:done_task, task: weekly, created_at: time)
+      create(:execution, task: weekly, created_at: time)
 
       #monthly
       monthly = create(:task, flag: 2, user: @user)
-      create(:done_task, task: monthly, created_at: time)
+      create(:execution, task: monthly, created_at: time)
 
       Timecop.return
 

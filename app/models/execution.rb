@@ -1,4 +1,4 @@
-class DoneTask < ActiveRecord::Base
+class Execution < ActiveRecord::Base
   belongs_to :task
   validates :task, presence: true
   after_create :set_date

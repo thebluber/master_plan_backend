@@ -13,7 +13,7 @@ class TasksServiceTest < ActiveSupport::TestCase
       daily = create(:task, flag: 0, user: @user)
       weekly = create(:task, flag: 1, user: @user)
       onetime_done = create(:task, flag: 3, user: @user)
-      create(:done_task, task: onetime_done)
+      create(:execution, task: onetime_done)
 
       Timecop.return
 

@@ -26,16 +26,6 @@ class TaskTest < ActiveSupport::TestCase
       Timecop.return
     end
 
-    should "find out whether the task is done or not without a specific date" do
-      assert_not @onetime.done?
-      create(:execution, task: @onetime)
-      assert @onetime.done?
-
-      assert_not @daily.done?
-      assert_not @weekly.done?
-      assert_not @monthly.done?
-    end
-
     should "find out whether the onetime task is done at given date" do
       assert_not @onetime.done?(Date.today)
       create(:execution, task: @onetime)
@@ -62,6 +52,47 @@ class TaskTest < ActiveSupport::TestCase
       assert @monthly.done?(Date.new(2015, 5, 31))
       assert_not @monthly.done?(Date.new(2015, 6, 3))
       assert_not @monthly.done?(Date.new(2015, 4, 3))
+    end
+  end
+
+  context "calculation for scheduled executions" do
+    setup do
+      @onetime = create(:task, flag: 3)
+
+      time = Time.local(2015, 5, 4, 18, 0, 0)
+      Timecop.travel(time)
+      @daily = create(:task, flag: 0)
+      @weekly = create(:task, flag: 1)
+      @monthly = create(:task, flag: 2)
+      Timecop.return
+    end
+
+    should "return 1 for onetime tasks" do
+      assert_equal @onetime.scheduled_executions, 1
+    end
+
+    #Correct representation would be Float::INFINITY but the database type is Integer
+    should "return 0 for cyclic tasks without deadline" do
+      assert_equal @daily.scheduled_executions, 0
+      assert_equal @weekly.scheduled_executions, 0
+      assert_equal @monthly.scheduled_executions, 0
+    end
+
+    should "return correct value for cyclic tasks with deadline" do
+      #daily
+      @daily.deadline = "2016-05-04"
+      @daily.save
+      assert_equal @daily.scheduled_executions, 366
+
+      #weekly
+      @weekly.deadline = "2016-05-04"
+      @weekly.save
+      assert_equal @weekly.scheduled_executions, 53
+
+      #monthly
+      @monthly.deadline = "2016-05-04"
+      @monthly.save
+      assert_equal @monthly.scheduled_executions, 13
     end
   end
 end

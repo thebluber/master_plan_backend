@@ -57,7 +57,7 @@ class Task < ActiveRecord::Base
 
   private
   def set_scheduled_executions
-    calculate_scheduled_executions if self.deadline_changed?
+    calculate_scheduled_executions if self.deadline_changed? || self.scheduled_executions.nil?
   end
 
   #calculate how many executions a task would have
@@ -75,6 +75,8 @@ class Task < ActiveRecord::Base
       elsif self.monthly?
         self.scheduled_executions = ((self.deadline - started_at)/30).ceil
       end
+    else
+      self.scheduled_executions = 0
     end
   end
 end

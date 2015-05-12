@@ -34,4 +34,52 @@ class TasksServiceTest < ActiveSupport::TestCase
       assert_equal TasksService.fetch_for(@user, "2015-05-06".to_date), @tasks_for_date
     end
   end
+
+  context "create_task_for_" do
+    setup do
+      @user = create :user
+      @category = create :category, user: @user
+      @goal = create :goal, user: @user
+
+      @params = build(:task, category_id: @category.id, goal_id: @goal.id, deadline: "2015-10-10")
+    end
+
+    should "create task from given params for user" do
+      task = TasksService.create_task_for @user, @params
+      %w{description flag deadline category_id goal_id}.each do |attr|
+        assert_equal task.send(attr), @params.send(attr)
+      end
+      task.save
+      assert @user.tasks.include? task
+    end
+
+    should "create task from given params for goal" do
+      @goal.deadline = "2016-05-08"
+      @goal.save
+      @params.deadline = nil
+      task = TasksService.create_task_for @goal, @params
+      %w{description flag category_id goal_id}.each do |attr|
+        assert_equal task.send(attr), @params.send(attr)
+      end
+
+      #new task inherits the deadline from goal
+      assert_equal task.deadline, @goal.deadline
+      task.save
+
+      assert @user.tasks.include? task
+      assert_equal task.goal, @goal
+    end
+
+    should "create task from given params for category" do
+      task = TasksService.create_task_for @category, @params
+      %w{description flag deadline goal_id}.each do |attr|
+        assert_equal task.send(attr), @params.send(attr)
+      end
+
+      task.save
+
+      assert @user.tasks.include? task
+      assert_equal task.category, @category
+    end
+  end
 end

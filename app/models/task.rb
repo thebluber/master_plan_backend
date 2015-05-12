@@ -29,6 +29,19 @@ class Task < ActiveRecord::Base
     self.flag == 2
   end
 
+  #Is the task completed
+  def completed?
+    if self.onetime?
+      return !self.executions.empty?
+    elsif self.scheduled_executions > 0
+      #for cyclic tasks with deadline
+      return self.executions.count >= self.scheduled_executions
+    else
+      #for cyclic tasks without deadline
+      return false
+    end
+  end
+
   #Is the task done at the given date
   def done?(date=nil)
     return false if self.executions.empty?

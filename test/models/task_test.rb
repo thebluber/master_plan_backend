@@ -95,4 +95,48 @@ class TaskTest < ActiveSupport::TestCase
       assert_equal @monthly.scheduled_executions, 13
     end
   end
+
+  context "completed?" do
+    setup do
+      @no_deadline = create(:task, flag: 0)
+      @onetime = create(:task, flag: 3)
+
+      time = Time.local(2015, 5, 4, 18, 0, 0)
+      #2015-05-04 is a monday
+      Timecop.travel(time)
+      @daily = create(:task, flag: 0, deadline: "2015-06-04")
+      @weekly = create(:task, flag: 1, deadline: "2015-06-04")
+      @monthly = create(:task, flag: 2, deadline: "2015-06-04")
+      Timecop.return
+    end
+
+    should "return false for cyclic tasks without deadline" do
+      create(:execution, task: @no_deadline)
+      assert_not @no_deadline.completed?
+    end
+
+    should "check whether a onetime task with or without deadline, a cyclic task with a deadline is completed?" do
+      assert_not @onetime.completed?
+      @onetime.deadline = "2015-10-10"
+      assert_not @onetime.completed?
+      create :execution, task: @onetime
+      assert @onetime.completed?
+
+
+      assert_not @daily.completed?
+      32.times { create :execution, task: @daily }
+      assert @daily.completed?
+
+      assert_not @weekly.completed?
+      4.times { create :execution, task: @weekly }
+      assert_not @weekly.completed?
+      4.times { create :execution, task: @weekly }
+      assert @weekly.completed?
+
+
+      assert_not @monthly.completed?
+      2.times { create :execution, task: @monthly }
+      assert @monthly.completed?
+    end
+  end
 end

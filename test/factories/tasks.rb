@@ -8,30 +8,15 @@ FactoryGirl.define do
     category
   end
 
-  factory :daily, class: Task do
-    user
-    goal
-    sequence(:description) { |n| "MyTask#{n}" }
+  factory :daily, parent: :task do
     flag 0
-    deadline "2015-05-04"
-    category
   end
 
-  factory :weekly, class: Task do
-    user
-    goal
-    sequence(:description) { |n| "MyTask#{n}" }
+  factory :weekly, parent: :task do
     flag 1
-    deadline "2015-05-04"
-    category
   end
 
-  factory :monthly, class: Task do
-    user
-    goal
-    sequence(:description) { |n| "MyTask#{n}" }
+  factory :monthly, parent: :task do
     flag 2
-    deadline "2015-05-04"
-    category
   end
 end

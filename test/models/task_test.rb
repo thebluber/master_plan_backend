@@ -10,18 +10,34 @@ class TaskTest < ActiveSupport::TestCase
   should validate_inclusion_of(:flag).in_range(0..3)
   should_not allow_value(4).for(:flag)
 
+  context "task types" do
+    setup do
+      @onetime = create(:task)
+      @daily = create(:daily)
+      @weekly = create(:weekly)
+      @monthly = create(:monthly)
+    end
+
+    should "detect the type of task" do
+      assert @onetime.onetime?
+      assert @daily.daily?
+      assert @weekly.weekly?
+      assert @monthly.monthly?
+    end
+  end
+
   context "done?" do
     setup do
-      @onetime = create(:task, flag: 3)
+      @onetime = create(:task)
 
       time = Time.local(2015, 5, 4, 18, 0, 0)
       #2015-05-04 is a monday
       Timecop.travel(time)
-      @daily = create(:task, flag: 0)
+      @daily = create(:daily)
       create(:execution, task: @daily)
-      @weekly = create(:task, flag: 1)
+      @weekly = create(:weekly)
       create(:execution, task: @weekly)
-      @monthly = create(:task, flag: 2)
+      @monthly = create(:monthly)
       create(:execution, task: @monthly)
       Timecop.return
     end
@@ -57,13 +73,13 @@ class TaskTest < ActiveSupport::TestCase
 
   context "calculation for scheduled executions" do
     setup do
-      @onetime = create(:task, flag: 3)
+      @onetime = create(:task)
 
       time = Time.local(2015, 5, 4, 18, 0, 0)
       Timecop.travel(time)
-      @daily = create(:task, flag: 0)
-      @weekly = create(:task, flag: 1)
-      @monthly = create(:task, flag: 2)
+      @daily = create(:daily)
+      @weekly = create(:weekly)
+      @monthly = create(:monthly)
       Timecop.return
     end
 
@@ -98,15 +114,15 @@ class TaskTest < ActiveSupport::TestCase
 
   context "completed?" do
     setup do
-      @no_deadline = create(:task, flag: 0)
-      @onetime = create(:task, flag: 3)
+      @no_deadline = create(:daily)
+      @onetime = create(:task)
 
       time = Time.local(2015, 5, 4, 18, 0, 0)
       #2015-05-04 is a monday
       Timecop.travel(time)
-      @daily = create(:task, flag: 0, deadline: "2015-06-04")
-      @weekly = create(:task, flag: 1, deadline: "2015-06-04")
-      @monthly = create(:task, flag: 2, deadline: "2015-06-04")
+      @daily = create(:daily, deadline: "2015-06-04")
+      @weekly = create(:weekly, deadline: "2015-06-04")
+      @monthly = create(:monthly, deadline: "2015-06-04")
       Timecop.return
     end
 

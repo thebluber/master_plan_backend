@@ -22,11 +22,14 @@ class GoalPresenterTest < ActiveSupport::TestCase
     assert_equal represented_goal['tasks'], tasks
   end
 
-  should 'represent expired 1 (true) or zero (false)' do
+  should 'represent expired' do
     goal = create :goal, deadline: Date.today - 1
-    assert_equal goal.extend(GoalPresenter).to_hash['expired'], 1
+    assert goal.extend(GoalPresenter).to_hash['expired']
 
     goal = create :goal, deadline: Date.today + 1
-    assert_equal goal.extend(GoalPresenter).to_hash['expired'], 0
+    assert_not goal.extend(GoalPresenter).to_hash['expired']
+
+    goal = create :goal
+    assert_not goal.extend(GoalPresenter).to_hash['expired']
   end
 end

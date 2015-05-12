@@ -13,7 +13,8 @@ module GoalPresenter
   collection :tasks, extend: TaskPresenter, class: Task
 
   def expired
-    deadline < Date.today ? 1 : 0
+    return deadline < Date.today if deadline
+    false
   end
 
 end

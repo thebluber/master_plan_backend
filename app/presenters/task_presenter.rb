@@ -10,12 +10,11 @@ module TaskPresenter
   property :category_id
   property :goal_id
   property :deadline
-  property :done, getter: lambda { |args|
-    if args[:date] ? self.done?(args[:date]) : self.done?
-      1
-    else
-      0
-    end
-  }
+  property :done, getter: lambda { |args| self.done?(args[:date]) }, skip_render: lambda { |object, args| args[:date].nil? }
+  property :completed
+
+  def completed
+    represented.completed?
+  end
 
 end

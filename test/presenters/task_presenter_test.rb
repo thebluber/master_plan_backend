@@ -17,16 +17,25 @@ class TaskPresenterTest < ActiveSupport::TestCase
     simple_fields.each do |field|
       assert_equal represented_task[field], task.send(field)
     end
+
+    assert_not task.completed?
+    assert_equal represented_task['completed'], task.completed?
+
   end
 
-  should 'represent done as 1 (true) or zero (false)' do
-    task = build :task
-    task.expects(:done?).returns(true)
+  should 'represent done as true or false' do
+    task = create :task
+    task.expects(:done?).with("2015-05-12").returns(true)
 
-    assert_equal task.extend(TaskPresenter).to_hash['done'], 1
+    assert task.extend(TaskPresenter).to_hash(date: "2015-05-12")['done']
 
-    task.expects(:done?).returns(false)
-    assert_equal task.extend(TaskPresenter).to_hash['done'], 0
+    task.expects(:done?).with("2015-05-12").returns(false)
+    assert_not task.extend(TaskPresenter).to_hash(date: "2015-05-12")['done']
 
+  end
+
+  should 'not represent done if date is not given' do
+    task = create :task
+    assert_nil task.extend(TaskPresenter).to_hash['done']
   end
 end

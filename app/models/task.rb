@@ -43,21 +43,15 @@ class Task < ActiveRecord::Base
   end
 
   #Is the task done at the given date
-  def done?(date=nil)
-    return false if self.executions.empty?
+  def done?(date)
     if self.onetime?
       return !self.executions.empty?
-    elsif date
-      if self.daily?
-        return !self.executions.where(year: date.year, month: date.month, cweek: date.cweek, cwday: date.cwday).empty?
-      elsif self.weekly?
-        return !self.executions.where(year: date.year, month: date.month, cweek: date.cweek).empty?
-      elsif self.monthly?
-        return !self.executions.where(year: date.year, month: date.month).empty?
-      end
-    else
-      #cyclic tasks are never done, if the date is not given
-      false
+    elsif self.daily?
+      return !self.executions.where(year: date.year, month: date.month, cweek: date.cweek, cwday: date.cwday).empty?
+    elsif self.weekly?
+      return !self.executions.where(year: date.year, month: date.month, cweek: date.cweek).empty?
+    elsif self.monthly?
+      return !self.executions.where(year: date.year, month: date.month).empty?
     end
   end
 

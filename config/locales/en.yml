@@ -24,3 +24,6 @@ en:
     tasks:
       create: Can not create new task
       update: Can not update task
+    goals:
+      create: Can not create new goal
+      update: Can not update task

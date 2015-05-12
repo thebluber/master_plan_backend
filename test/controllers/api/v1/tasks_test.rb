@@ -79,7 +79,7 @@ class API::V1::TasksTest < ActionController::TestCase
       end
       assert_nil Task.last.goal
       new_task[:id] = Task.last.id
-      new_task[:done] = 0
+      new_task[:completed] = false
       assert_equal JSON.parse(last_response.body), new_task.stringify_keys
     end
 
@@ -97,7 +97,7 @@ class API::V1::TasksTest < ActionController::TestCase
       end
       assert_nil Task.last.deadline
       new_task[:id] = Task.last.id
-      new_task[:done] = 0
+      new_task[:completed] = false
       assert_equal JSON.parse(last_response.body), new_task.stringify_keys
     end
 
@@ -183,7 +183,7 @@ class API::V1::TasksTest < ActionController::TestCase
 
       assert last_response.ok?
       update[:id] = @task.id
-      update[:done] = 0
+      update[:completed] = false
       assert_equal JSON.parse(last_response.body), update.stringify_keys
     end
 

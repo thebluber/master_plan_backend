@@ -19,7 +19,7 @@ class GoalPresenterTest < ActiveSupport::TestCase
       assert_equal represented_goal[field], goal.send(field)
     end
 
-    assert_equal represented_goal['tasks'], tasks
+    assert_equal represented_goal['tasks'], tasks.to_hash
   end
 
   should 'represent expired' do

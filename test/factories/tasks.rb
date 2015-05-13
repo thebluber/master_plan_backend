@@ -4,7 +4,7 @@ FactoryGirl.define do
     goal
     sequence(:description) { |n| "MyTask#{n}" }
     flag 3
-    deadline "2015-05-04"
+    deadline nil
     category
   end
 

@@ -8,11 +8,11 @@ class TasksServiceTest < ActiveSupport::TestCase
       time = Time.local(2015, 5, 6, 18, 0, 0) #2015-05-06 is a Wednesday
       Timecop.travel(time)
 
-      onetime_undone = create(:task, flag: 3, user: @user)
-      monthly = create(:task, flag: 2, user: @user)
-      daily = create(:task, flag: 0, user: @user)
-      weekly = create(:task, flag: 1, user: @user)
-      onetime_done = create(:task, flag: 3, user: @user)
+      onetime_undone = create(:task, user: @user)
+      monthly = create(:monthly, user: @user)
+      daily = create(:daily, user: @user)
+      weekly = create(:weekly, user: @user)
+      onetime_done = create(:task, user: @user)
       create(:execution, task: onetime_done)
 
       Timecop.return
@@ -29,8 +29,8 @@ class TasksServiceTest < ActiveSupport::TestCase
     end
 
     should "not return tasks created after the given date" do
-      create(:task, flag: 1, user: @user)
-      create(:task, flag: 3, user: @user)
+      create(:weekly, user: @user)
+      create(:task, user: @user)
       assert_equal TasksService.fetch_for(@user, "2015-05-06".to_date), @tasks_for_date
     end
   end

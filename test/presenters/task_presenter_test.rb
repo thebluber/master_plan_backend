@@ -12,6 +12,7 @@ class TaskPresenterTest < ActiveSupport::TestCase
     }
 
     task = build :task
+    task.scheduled_executions = 0
     represented_task = task.extend(TaskPresenter).to_hash
 
     simple_fields.each do |field|

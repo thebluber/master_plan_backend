@@ -120,6 +120,7 @@ class API::V1::GoalsTest < ActionController::TestCase
       assert_equal last_response.status, 201
       @task.id = Task.last.id
       @task.goal = @goal
+      @task.scheduled_executions = 0
       assert_equal last_response.body, @task.to_json
     end
   end

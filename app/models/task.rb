@@ -1,5 +1,5 @@
 class Task < ActiveRecord::Base
-  belongs_to :user
+  belongs_to :user, inverse_of: :tasks
   belongs_to :goal
   belongs_to :category
   has_many :executions
@@ -12,6 +12,10 @@ class Task < ActiveRecord::Base
   validates :flag, inclusion: { in: 0..3 }
 
   before_save :set_scheduled_executions
+
+  scope :for_user, ->(user) { where user_id: user.id }
+  scope :created_before, ->(date) { where("created_at < ?", date + 1) }
+  scope :incomplete, -> { select { |task| task.scheduled_executions == 0 || task.executions.count < task.scheduled_executions } }
 
   def onetime?
     self.flag == 3

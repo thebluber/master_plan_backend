@@ -155,4 +155,37 @@ class TaskTest < ActiveSupport::TestCase
       assert @monthly.completed?
     end
   end
+
+  context "scopes" do
+    setup do
+      @user = create :user
+
+      @completed = create :daily, user: @user, deadline: Date.today + 1
+      2.times { create :execution, task: @completed }
+
+      @daily = create :daily, user: @user, deadline: nil
+      @weekly = create :weekly, user: @user, deadline: nil
+      @monthly = create :monthly, user: @user, deadline: nil
+
+      @onetime = create :task, user: @user
+
+      #tasks from other user
+      @other_daily = create :daily, deadline: nil
+      @other_weekly = create :weekly, deadline: nil
+    end
+
+    should "return tasks for user" do
+      assert_equal Task.for_user(@user), [@completed, @daily, @weekly, @monthly, @onetime]
+    end
+
+    should "return tasks created inclusive and before the given date" do
+      new_task = create :task, user: @user, created_at: Date.today + 1
+      assert_not Task.created_before(Date.today).include?(new_task)
+      assert Task.created_before(Date.today + 1).include?(new_task)
+    end
+
+    should "return user's tasks incomplete and created_before the given date" do
+      assert_equal Task.for_user(@user).created_before(Date.today).incomplete, [@daily, @weekly, @monthly, @onetime]
+    end
+  end
 end

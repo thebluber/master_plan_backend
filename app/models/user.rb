@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
          :recoverable, :rememberable, :trackable, :validatable
   validates :email, :password, presence: true
   validates :password, length: { minimum: 4 }
-  has_many :tasks
-  has_many :goals
-  has_many :categories
+  has_many :tasks, inverse_of: :user
+  has_many :goals, inverse_of: :user
+  has_many :categories, inverse_of: :user
 end

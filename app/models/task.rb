@@ -15,7 +15,7 @@ class Task < ActiveRecord::Base
 
   scope :for_user, ->(user) { where user_id: user.id }
   scope :created_before, ->(date) { where("created_at < ?", date + 1) }
-  scope :incomplete, -> { select { |task| task.scheduled_executions == 0 || task.executions.count < task.scheduled_executions } }
+  scope :incomplete, -> { select { |task| !task.completed? } }
 
   def onetime?
     self.flag == 3
@@ -35,15 +35,7 @@ class Task < ActiveRecord::Base
 
   #Is the task completed
   def completed?
-    if self.onetime?
-      return !self.executions.empty?
-    elsif self.scheduled_executions > 0
-      #for cyclic tasks with deadline
-      return self.executions.count >= self.scheduled_executions
-    else
-      #for cyclic tasks without deadline
-      return false
-    end
+    self.scheduled_executions != 0 && self.executions.count >= self.scheduled_executions
   end
 
   #Is the task done at the given date

@@ -114,7 +114,7 @@ class TaskTest < ActiveSupport::TestCase
 
   context "completed?" do
     setup do
-      @no_deadline = create(:daily)
+      @no_deadline = create(:daily, deadline: nil)
       @onetime = create(:task)
 
       time = Time.local(2015, 5, 4, 18, 0, 0)

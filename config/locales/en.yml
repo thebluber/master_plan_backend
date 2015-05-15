@@ -27,3 +27,8 @@ en:
     goals:
       create: Can not create new goal
       update: Can not update task
+    categories:
+      create: Can not create new category
+      update: Can not update category
+      deletable: Can not delete this category, there are tasks attached to it
+      delete: Can not delete category

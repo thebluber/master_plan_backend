@@ -182,4 +182,45 @@ class TaskTest < ActiveSupport::TestCase
       assert_equal Task.for_user(@user).created_before(Date.today).incomplete, [@daily, @weekly, @monthly, @onetime]
     end
   end
+
+  context "delete_execution_for" do
+    setup do
+      @daily = create :daily
+      @weekly = create :weekly
+      @monthly = create :monthly
+      @onetime = create :task
+    end
+
+    should "delete execution for given date for daily task" do
+      @daily.executions.create.calendar_date = Date.today - 7
+      assert @daily.delete_execution_for(Date.today - 7)
+      @daily.reload
+      assert @daily.executions.empty?
+    end
+
+    should "delete execution for given date for weekly task" do
+      @weekly.executions.create.calendar_date = Date.new(2015,5,15) #Friday
+      @weekly.executions.create.calendar_date = Date.new(2015,5,10)
+      assert @weekly.delete_execution_for(Date.new(2015,5,6))
+      @weekly.reload
+      assert_equal @weekly.executions.count, 1
+      assert @weekly.done? Date.new(2015,5,15)
+    end
+
+    should "delete execution for given date for monthly task" do
+      @monthly.executions.create.calendar_date = Date.new(2015,5,15) #Friday
+      @monthly.executions.create.calendar_date = Date.new(2015,4,10)
+      assert @monthly.delete_execution_for(Date.new(2015,5,6))
+      @monthly.reload
+      assert_equal @monthly.executions.count, 1
+      assert @monthly.done? Date.new(2015,4,15)
+    end
+
+    should "delete execution for given date for onetime task" do
+      @onetime.executions.create.calendar_date = Date.today - 365
+      assert @onetime.delete_execution_for(Date.today)
+      @onetime.reload
+      assert @onetime.executions.empty?
+    end
+  end
 end

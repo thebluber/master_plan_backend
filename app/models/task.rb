@@ -51,6 +51,22 @@ class Task < ActiveRecord::Base
     end
   end
 
+  #Delete execution for the given date depending on task type
+  def delete_execution_for(date)
+    executions_for_date = []
+    if self.onetime?
+      executions_for_date = self.executions
+    elsif self.daily?
+      executions_for_date = self.executions.where(year: date.year, month: date.month, cweek: date.cweek, cwday: date.cwday)
+    elsif self.weekly?
+      executions_for_date = self.executions.where(year: date.year, cweek: date.cweek)
+    elsif self.monthly?
+      executions_for_date = self.executions.where(year: date.year, month: date.month)
+    end
+
+    !executions_for_date.empty? && executions_for_date.first.destroy
+  end
+
   private
   def set_scheduled_executions
     calculate_scheduled_executions if self.deadline_changed? || self.scheduled_executions.nil?

@@ -8,4 +8,11 @@ class User < ActiveRecord::Base
   has_many :tasks, inverse_of: :user
   has_many :goals, inverse_of: :user
   has_many :categories, inverse_of: :user
+
+  after_create :add_default_categories
+
+  private
+  def add_default_categories
+    UsersService.create_default_categories(self)
+  end
 end

@@ -8,4 +8,14 @@ class UserTest < ActiveSupport::TestCase
   should have_many(:goals)
   should have_many(:tasks)
   should have_many(:categories)
+
+  context "default categories" do
+    setup do
+      @user = create :user
+    end
+
+    should "have default categories" do
+      assert_equal @user.categories.map(&:name), ["work", "personal", "miscellaneous"]
+    end
+  end
 end

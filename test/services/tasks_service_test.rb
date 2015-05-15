@@ -6,16 +6,14 @@ class TasksServiceTest < ActiveSupport::TestCase
       @user = create(:user)
 
       time = Time.local(2015, 5, 6, 18, 0, 0) #2015-05-06 is a Wednesday
-      Timecop.travel(time)
 
-      onetime_undone = create(:task, user: @user)
-      monthly = create(:monthly, user: @user)
-      daily = create(:daily, user: @user)
-      weekly = create(:weekly, user: @user)
-      onetime_done = create(:task, user: @user)
-      create(:execution, task: onetime_done)
+      onetime_undone = create(:task, user: @user, created_at: time)
+      monthly = create(:monthly, user: @user, created_at: time)
+      daily = create(:daily, user: @user, created_at: time)
+      weekly = create(:weekly, user: @user, created_at: time)
+      onetime_done = create(:task, user: @user, created_at: time)
+      create(:execution, task: onetime_done).calendar_date = time.to_date
 
-      Timecop.return
 
       @tasks_for_date = [daily, weekly, monthly, onetime_undone]
     end

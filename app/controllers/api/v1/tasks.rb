@@ -82,6 +82,52 @@ module API
             end
           end
 
+          desc "Create execution for task with given id"
+          namespace :check_for_date do
+            params do
+              requires :date, type: Date
+            end
+            route_param :date do
+              desc "POST /tasks/:id/check_for_date/:date"
+              post do
+
+                if @task.done? params[:date]
+                  status 200
+                else
+                  new_execution = @task.executions.create
+                  if new_execution.calendar_date = params[:date]
+                    status 201
+                  else
+                    error! I18n.t("errors.executions.create"), 500
+                  end
+                end
+
+              end
+            end
+          end
+
+          desc "Delete execution for task with given id"
+          namespace :uncheck_for_date do
+            params do
+              requires :date, type: Date
+            end
+            route_param :date do
+              desc "DELETE /tasks/:id/uncheck_for_date/:date"
+              delete do
+
+                #TODO differenciate server error and client error
+                #2 situations could cause error:
+                #1.task is not yet done on the given date => 400 client error
+                #2.execution can't be destroyed => 500 server error
+                if @task.delete_execution_for params[:date]
+                  status 200
+                else
+                  error! I18n.t("errors.tasks.undone"), 400
+                end
+
+              end
+            end
+          end
         end
 
       end

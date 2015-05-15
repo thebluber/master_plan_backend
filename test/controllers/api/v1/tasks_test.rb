@@ -23,24 +23,21 @@ class API::V1::TasksTest < ActionController::TestCase
       @user = create(:user)
 
       time = Time.local(2015, 5, 6, 18, 0, 0) #2015-05-06 is a Wednesday
-      Timecop.travel(time)
 
       #onetime
-      onetime = create(:task, flag: 3, user: @user)
+      onetime = create(:task, user: @user, created_at: time)
 
       #daily
-      daily = create(:task, flag: 0, user: @user)
-      create(:execution, task: daily, created_at: time)
+      daily = create(:daily, user: @user, created_at: time)
+      create(:execution, task: daily).calendar_date = time.to_date
 
       #weekly
-      weekly = create(:task, flag: 1, user: @user)
-      create(:execution, task: weekly, created_at: time)
+      weekly = create(:weekly, user: @user, created_at: time)
+      create(:execution, task: weekly).calendar_date = time.to_date
 
       #monthly
-      monthly = create(:task, flag: 2, user: @user)
-      create(:execution, task: monthly, created_at: time)
-
-      Timecop.return
+      monthly = create(:monthly, user: @user, created_at: time)
+      create(:execution, task: monthly).calendar_date = time.to_date
 
       log_in @user.email, "1234"
 
@@ -211,6 +208,72 @@ class API::V1::TasksTest < ActionController::TestCase
       put "/api/v1/tasks/#{@task.id}", {category_id: 10000}
       assert_equal last_response.status, 400
       assert_equal JSON.parse(last_response.body)["error"], "Couldn't find Category with 'id'=10000"
+    end
+  end
+
+  context "/tasks/:id/check_for_date/:date" do
+    setup do
+      @user = create :user
+      log_in @user.email, "1234"
+
+      @task = create :daily, user: @user
+    end
+
+    should "create a new execution for the given task and given date" do
+      post "/api/v1/tasks/#{@task.id}/check_for_date/2015-05-15"
+      assert_equal last_response.status, 201
+      assert @task.done? Date.new(2015,5,15)
+    end
+
+    should "not create 2 executions for same date" do
+      post "/api/v1/tasks/#{@task.id}/check_for_date/2015-05-15"
+      assert_equal last_response.status, 201
+      post "/api/v1/tasks/#{@task.id}/check_for_date/2015-05-15"
+      assert_equal last_response.status, 200
+      assert @task.done? Date.new(2015,5,15)
+      assert_equal @task.executions.count, 1
+    end
+  end
+
+  context "/tasks/:id/uncheck_for_date/:date" do
+    setup do
+      @user = create :user
+      log_in @user.email, "1234"
+
+      @task = create :daily, user: @user
+      @execution = create :execution, task: @task
+      @execution.calendar_date = Date.today
+
+      @monthly = create :monthly, user: @user
+      @execution_current = create :execution, task: @monthly
+      @execution_current.calendar_date = Date.new(2015,5,15)
+      @execution_past = create :execution, task: @monthly
+      @execution_past.calendar_date = Date.new(2015,4,1)
+
+      @onetime = create :task, user: @user
+      @execution_onetime = create :execution, task: @onetime
+      @execution_onetime.calendar_date = Date.today - 365
+    end
+
+    should "delete the existing execution on the given date" do
+      delete "/api/v1/tasks/#{@task.id}/uncheck_for_date/#{Date.today}"
+      assert last_response.ok?
+      @task.reload
+      assert_nil @task.executions.find_by_id(@execution.id)
+
+      assert_not @task.done? Date.today
+    end
+
+    should "delete executions on other date depending on task type" do
+      delete "/api/v1/tasks/#{@monthly.id}/uncheck_for_date/#{Date.new(2015,5,1)}"
+      assert last_response.ok?
+      @monthly.reload
+      assert_nil @monthly.executions.find_by_id(@execution_current)
+      assert @monthly.executions.include? @execution_past
+
+      delete "/api/v1/tasks/#{@onetime.id}/uncheck_for_date/#{Date.today}"
+      assert last_response.ok?
+      assert_nil @onetime.executions.find_by_id(@execution_onetime)
     end
   end
 end

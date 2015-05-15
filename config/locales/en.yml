@@ -24,6 +24,7 @@ en:
     tasks:
       create: Can not create new task
       update: Can not update task
+      undone: Task is not done on the given date
     goals:
       create: Can not create new goal
       update: Can not update task
@@ -32,3 +33,7 @@ en:
       update: Can not update category
       deletable: Can not delete this category, there are tasks attached to it
       delete: Can not delete category
+    executions:
+      create: Can not create execution
+      delete: Can not delete execution
+

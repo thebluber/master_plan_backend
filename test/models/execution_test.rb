@@ -2,10 +2,11 @@ require 'test_helper'
 
 class ExecutionTest < ActiveSupport::TestCase
   should belong_to(:task)
-  context "creation date" do
+  context "set calendar date" do
     setup do
-      time = Time.local(2015, 5, 4, 18, 0, 0)
-      @execution = create(:execution, created_at: time)
+      @execution = create :execution
+      date = Date.new(2015, 5, 4)
+      @execution.calendar_date = date
     end
 
     should "set cwday, cweek, month and year according to the creation date" do

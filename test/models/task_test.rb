@@ -32,14 +32,12 @@ class TaskTest < ActiveSupport::TestCase
 
       time = Time.local(2015, 5, 4, 18, 0, 0)
       #2015-05-04 is a monday
-      Timecop.travel(time)
-      @daily = create(:daily)
-      create(:execution, task: @daily)
-      @weekly = create(:weekly)
-      create(:execution, task: @weekly)
-      @monthly = create(:monthly)
-      create(:execution, task: @monthly)
-      Timecop.return
+      @daily = create(:daily, created_at: time)
+      create(:execution, task: @daily).calendar_date = time.to_date
+      @weekly = create(:weekly, created_at: time)
+      create(:execution, task: @weekly).calendar_date = time.to_date
+      @monthly = create(:monthly, created_at: time)
+      create(:execution, task: @monthly).calendar_date = time.to_date
     end
 
     should "find out whether the onetime task is done at given date" do
@@ -76,11 +74,9 @@ class TaskTest < ActiveSupport::TestCase
       @onetime = create(:task)
 
       time = Time.local(2015, 5, 4, 18, 0, 0)
-      Timecop.travel(time)
-      @daily = create(:daily)
-      @weekly = create(:weekly)
-      @monthly = create(:monthly)
-      Timecop.return
+      @daily = create(:daily, created_at: time)
+      @weekly = create(:weekly, created_at: time)
+      @monthly = create(:monthly, created_at: time)
     end
 
     should "return 1 for onetime tasks" do
@@ -119,11 +115,9 @@ class TaskTest < ActiveSupport::TestCase
 
       time = Time.local(2015, 5, 4, 18, 0, 0)
       #2015-05-04 is a monday
-      Timecop.travel(time)
-      @daily = create(:daily, deadline: "2015-06-04")
-      @weekly = create(:weekly, deadline: "2015-06-04")
-      @monthly = create(:monthly, deadline: "2015-06-04")
-      Timecop.return
+      @daily = create(:daily, deadline: "2015-06-04", created_at: time)
+      @weekly = create(:weekly, deadline: "2015-06-04", created_at: time)
+      @monthly = create(:monthly, deadline: "2015-06-04", created_at: time)
     end
 
     should "return false for cyclic tasks without deadline" do

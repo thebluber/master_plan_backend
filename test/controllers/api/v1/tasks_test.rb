@@ -15,6 +15,15 @@ class API::V1::TasksTest < ActionController::TestCase
 
       put "/api/v1/tasks/1", {}
       assert_equal last_response.status, 401
+
+      post "/api/v1/tasks/1/check_for_date/2015-05-06"
+      assert_equal last_response.status, 401
+
+      delete "/api/v1/tasks/1/uncheck_for_date/2015-05-06"
+      assert_equal last_response.status, 401
+
+      delete "/api/v1/tasks/1"
+      assert_equal last_response.status, 401
     end
   end
 
@@ -182,6 +191,12 @@ class API::V1::TasksTest < ActionController::TestCase
       update[:id] = @task.id
       update[:completed] = false
       assert_equal JSON.parse(last_response.body), update.stringify_keys
+    end
+
+    should "delete task" do
+      delete "/api/v1/tasks/#{@task.id}"
+      assert last_response.ok?
+      assert_nil @user.tasks.find_by_id @task.id
     end
 
     should "not update the task, if the input is invalid" do

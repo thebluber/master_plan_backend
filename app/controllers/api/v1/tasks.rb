@@ -82,6 +82,15 @@ module API
             end
           end
 
+          desc "Delete the task with given id"
+          delete do
+            if @task.destroy
+              status 200
+            else
+              error! I18n.t("errors.tasks.delete"), 500
+            end
+          end
+
           desc "Create execution for task with given id"
           namespace :check_for_date do
             params do

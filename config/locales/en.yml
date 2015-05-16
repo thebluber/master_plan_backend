@@ -25,6 +25,7 @@ en:
       create: Can not create new task
       update: Can not update task
       undone: Task is not done on the given date
+      delete: Can not delete task
     goals:
       create: Can not create new goal
       update: Can not update task

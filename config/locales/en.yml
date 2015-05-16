@@ -29,6 +29,7 @@ en:
     goals:
       create: Can not create new goal
       update: Can not update task
+      delete: Can not delete goal
     categories:
       create: Can not create new category
       update: Can not update category

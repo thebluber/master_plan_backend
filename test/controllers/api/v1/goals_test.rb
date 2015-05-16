@@ -17,6 +17,9 @@ class API::V1::GoalsTest < ActionController::TestCase
       put "/api/v1/goals/1", { title: "" }
       assert_equal last_response.status, 401
 
+      delete "/api/v1/goals/1"
+      assert_equal last_response.status, 401
+
       post "/api/v1/goals/1/tasks", { description: "", flag: 1, category_id: 1 }
       assert_equal last_response.status, 401
     end
@@ -97,6 +100,13 @@ class API::V1::GoalsTest < ActionController::TestCase
       assert last_response.ok?
       assert_not other_user.goals.include? @goal
       assert @user.goals.include? @goal
+    end
+
+    should "DELETE /goals/:id" do
+      delete "/api/v1/goals/#{@goal.id}"
+      assert last_response.ok?
+      @user.reload
+      assert_nil @user.goals.find_by_id @goal.id
     end
   end
 

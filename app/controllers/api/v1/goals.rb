@@ -59,6 +59,15 @@ module API
             end
           end
 
+          desc "DELETE /goals/:id"
+          delete do
+            if @goal.destroy
+              status 200
+            else
+              error! I18n.t("errors.goals.delete"), 500
+            end
+          end
+
           desc "POST /goals/:id/tasks"
           params do
             requires :description, type: String

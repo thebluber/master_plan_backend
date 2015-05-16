@@ -24,8 +24,8 @@ class TasksService
 
       new_task.category_id = params[:category_id]
       new_task.user_id = owner.user_id
-      #if deadline is not given the new task should have the save deadline as it's goal
-      params[:deadline] ? new_task.deadline = params[:deadline] : new_task.deadline = owner.deadline
+      #if deadline is not given the new task should have the same deadline as it's goal
+      new_task.deadline = params[:deadline] || owner.deadline
 
     elsif owner.is_a?(Category)
 

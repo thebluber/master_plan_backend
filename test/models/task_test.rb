@@ -223,4 +223,16 @@ class TaskTest < ActiveSupport::TestCase
       assert @onetime.executions.empty?
     end
   end
+
+  context "dependent for executions" do
+    setup do
+      @task = create :daily
+      @execution = @task.executions.create
+      @task.reload
+    end
+    should "destroy executions after deletion" do
+      @task.destroy
+      assert_nil Execution.find_by_id @execution.id
+    end
+  end
 end

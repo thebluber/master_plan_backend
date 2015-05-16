@@ -2,7 +2,7 @@ class Task < ActiveRecord::Base
   belongs_to :user, inverse_of: :tasks
   belongs_to :goal
   belongs_to :category
-  has_many :executions
+  has_many :executions, dependent: :destroy
   validates :user, :category, :flag, :description, presence: true
   #flag should be one of following:
   #0: daily

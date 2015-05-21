@@ -21,6 +21,8 @@
 
 en:
   errors:
+    users:
+      sign_up: Can not registrate user
     tasks:
       create: Can not create new task
       update: Can not update task

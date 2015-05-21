@@ -5,6 +5,24 @@ module API
       include Devise::Controllers::Rememberable
       
       resource :users do
+        desc "sign up user"
+        params do
+          requires :user, type: Hash do
+            requires :email, type: String
+            requires :password, type: String
+          end
+        end
+        post 'sign_up' do
+          new_user = User.new
+          new_user.email = params[:user][:email]
+          new_user.password = params[:user][:password]
+          if new_user.save
+            status 201
+          else
+            error! I18n.t("errors.users.sign_up"), 500
+          end
+        end
+
         desc "sign in user"
         params do
           requires :user, type: Hash do

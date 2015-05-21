@@ -35,4 +35,16 @@ class API::V1::UsersTest < ActionController::TestCase
       assert last_response.ok?
     end
   end
+
+  context "user registration" do
+    setup do
+      @user = { email: "user@example.de", password: "1234" }
+    end
+
+    should "sign up new user" do
+      post "/api/v1/users/sign_up", { user: @user }
+      assert_equal last_response.status, 201
+      assert_equal User.last.email, @user[:email]
+    end
+  end
 end

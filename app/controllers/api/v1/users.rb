@@ -2,19 +2,22 @@ module API
   module V1
     class Users < Grape::API
       include API::V1::Defaults
+      include Devise::Controllers::Rememberable
+      
       resource :users do
         desc "sign in user"
         params do
           requires :user, type: Hash do
             requires :email, type: String
             requires :password, type: String
+            optional :remember_me, type: Boolean
           end
         end
         post 'sign_in' do
           env['devise.allow_params_authentication'] = true
           warden.logout if authenticated?
           if warden.authenticate(scope: :user)
-            status 200
+            represent_variant current_user
           else
             error! "Wrong email address or password", 401
           end

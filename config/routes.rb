@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  root 'home#index'
   devise_for :users
   mount API::Base => '/api'
   # The priority is based upon order of creation: first created -> highest priority.

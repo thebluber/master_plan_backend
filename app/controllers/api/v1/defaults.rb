@@ -6,6 +6,7 @@ module API
 
         version 'v1'
         format :json
+        default_format :json
 
         rescue_from ActiveRecord::RecordNotFound do |e|
           #remove sql expression in the returning message

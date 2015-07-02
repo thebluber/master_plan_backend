@@ -26,11 +26,6 @@ class API::V1::UsersTest < ActionController::TestCase
     end
 
     should "sign out via api" do
-      sign_in @user
-      delete "/api/v1/users/sign_out"
-      assert last_response.ok?
-      assert_nil @user.remember_created_at
-
       delete "/api/v1/users/sign_out"
       assert last_response.ok?
     end

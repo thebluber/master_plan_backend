@@ -20,7 +20,12 @@ module API
           route_param :date do
             desc "return user'tasks on the given date"
             get do
-              (represent_variant TasksService.fetch_for(current_user, params[:date])).to_hash({ date: params[:date] })
+              tasks = represent_variant TasksService.fetch_for(current_user, params[:date])
+              if tasks.empty?
+                tasks
+              else
+                tasks.to_hash({ date: params[:date] })
+              end
             end
           end
         end

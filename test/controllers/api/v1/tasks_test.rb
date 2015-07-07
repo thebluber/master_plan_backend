@@ -27,6 +27,22 @@ class API::V1::TasksTest < ActionController::TestCase
     end
   end
 
+  context "user with empty tasks" do
+    setup do
+      @user = create(:user)
+      log_in @user.email, "1234"
+    end
+    should "return empty arrays" do
+      get "/api/v1/tasks"
+      assert last_response.ok?
+      assert_equal last_response.body, "[]"
+
+      get "/api/v1/tasks/for_date/2015-07-08"
+      assert last_response.ok?
+      assert_equal last_response.body, "[]"
+    end
+  end
+
   context "/tasks" do
     setup do
       @user = create(:user)

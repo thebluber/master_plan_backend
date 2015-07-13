@@ -100,9 +100,6 @@ class API::V1::TasksTest < ActionController::TestCase
         assert_equal Task.last[k].to_s, new_task[k].to_s
       end
       assert_nil Task.last.goal
-      new_task[:id] = Task.last.id
-      new_task[:completed] = false
-      assert_equal JSON.parse(last_response.body), new_task.stringify_keys
     end
 
     should "create new task with goal, without deadline" do
@@ -118,9 +115,6 @@ class API::V1::TasksTest < ActionController::TestCase
         assert_equal Task.last[k].to_s, new_task[k].to_s
       end
       assert_nil Task.last.deadline
-      new_task[:id] = Task.last.id
-      new_task[:completed] = false
-      assert_equal JSON.parse(last_response.body), new_task.stringify_keys
     end
 
     should "not create new task for invalid input params" do
@@ -204,9 +198,14 @@ class API::V1::TasksTest < ActionController::TestCase
       put "/api/v1/tasks/#{@task.id}", update
 
       assert last_response.ok?
-      update[:id] = @task.id
-      update[:completed] = false
-      assert_equal JSON.parse(last_response.body), update.stringify_keys
+      response = JSON.parse(last_response.body)
+      assert_equal response["id"], @task.id
+      assert_equal response["completed"], false
+      assert_equal response["description"], update[:description]
+      assert_equal response["type"], "monthly"
+      assert_equal response["deadline"], update[:deadline]
+      assert_equal response["category"], { "id" =>  @category.id, "name" => @category.name }
+      assert_equal response["goal"], { "id" =>  @goal.id, "title" => @goal.title }
     end
 
     should "delete task" do

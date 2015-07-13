@@ -6,9 +6,12 @@ module TaskPresenter
 
   property :id
   property :description
-  property :flag
-  property :category_id
-  property :goal_id
+  property :type
+  property :category, extend: CategoryPresenter, class: Category
+  property :goal, class: Goal do
+    property :id
+    property :title
+  end
   property :deadline
   property :done, skip_render: lambda { |object, args| args[:date].nil? }, getter: lambda { |args| args[:date] ? self.done?(args[:date]) : nil }
   property :completed
@@ -17,4 +20,8 @@ module TaskPresenter
     represented.completed?
   end
 
+  def type
+    flags = ["daily", "weekly", "monthly", "onetime"]
+    flags[represented.flag]
+  end
 end

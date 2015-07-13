@@ -5,9 +5,6 @@ class TaskPresenterTest < ActiveSupport::TestCase
     simple_fields = %w{
       id
       description
-      flag
-      category_id
-      goal_id
       deadline
     }
 
@@ -18,9 +15,16 @@ class TaskPresenterTest < ActiveSupport::TestCase
     simple_fields.each do |field|
       assert_equal represented_task[field], task.send(field)
     end
+    
+    #flag should be replaced by string
+    assert_equal represented_task['type'], 'onetime'
 
     assert_not task.completed?
     assert_equal represented_task['completed'], task.completed?
+
+    #nested fields
+    assert_equal represented_task['category'], task.category.extend(CategoryPresenter).to_hash
+    assert_equal represented_task['goal'], {"id" => task.goal_id, "title" => task.goal.title}
 
   end
 

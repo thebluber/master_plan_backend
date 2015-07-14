@@ -14,7 +14,7 @@ Task.create({user_id: user.id, description: "Send mom a birthday greeting", cate
 Task.create({user_id: user.id, description: "Physiotherapy", category_id: user.categories[2].id, flag: 1})
 
 #with deadline
-Task.create({user_id: user.id, description: "Report", category_id: user.categories[0].id, flag: 3})
+Task.create({user_id: user.id, description: "Report", category_id: user.categories[0].id, flag: 3, deadline: "2016-12-30"})
 
 #with goal
 goal = Goal.create({user_id: user.id, title: "Finish reading the book", description: "Goals!: How to Get Everything You Want Faster Than You Ever Thought Possible"})
